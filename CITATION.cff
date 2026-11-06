@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software in your research, please cite it."
+type: software
+
+title: "Extraction and Analysis of Beta Bursts from EEG Signals"
+
+authors:
+  - family-names: Banerjee
+    given-names: Anandi
+
+repository-code: "https://github.com/Aanandi10/Extraction-and-Analysis-of-Beta-Bursts-from-EEG-signals"
+
+abstract: >
+  MATLAB-based implementation for the extraction,
+  detection and analysis of beta bursts from EEG signals,
+  incorporating Hilbert transform-based amplitude envelope
+  estimation, threshold-based burst detection,
+  spectral analysis and time-frequency visualisation.
+
