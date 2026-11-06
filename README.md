@@ -1,202 +1,175 @@
-# Extraction-and-Analysis-of-Beta-Bursts-from-EEG-signals
-
 # Extraction and Analysis of Beta Bursts from EEG Signals
 
-A MATLAB-based signal processing pipeline for the extraction, detection, and analysis of beta bursts from electroencephalography (EEG) signals.
-
-The project investigates transient beta-band oscillatory activity through signal filtering, amplitude envelope extraction, threshold-based burst detection, spectral analysis, and time-frequency visualisation.
+A MATLAB-based pipeline for the extraction, detection, and analysis of beta bursts in electroencephalography (EEG) signals.
 
 ## Overview
 
-Beta oscillations (13–30 Hz) are associated with sensorimotor processing and the regulation of voluntary movement. Rather than occurring continuously, beta activity can appear as brief, transient high-amplitude events known as **beta bursts**.
+Beta bursts are transient increases in beta-band neural activity (13–30 Hz) that are associated with sensorimotor processing and movement control. Studying their temporal and spectral characteristics can provide insights into the neural mechanisms underlying human movement.
 
-This project implements a computational pipeline to identify and characterise beta bursts in EEG recordings and investigate their temporal and spectral properties.
+This project implements a MATLAB-based signal processing pipeline to identify and analyse beta bursts from EEG recordings. It combines beta-band filtering, Hilbert transform-based amplitude envelope extraction, threshold-based burst detection, spectral analysis, and time-frequency visualisation.
+
+The project was developed as part of the **Summer Research Fellowship Programme (SRFP) 2025** at the Centre for Neuroscience, Indian Institute of Science (IISc), Bengaluru.
 
 ## Objectives
 
-- Extract beta-band activity from raw EEG recordings.
-- Estimate the instantaneous amplitude envelope using the Hilbert transform.
-- Implement global threshold-based beta burst detection.
+- Extract beta-band activity from EEG recordings.
+- Estimate the instantaneous amplitude envelope of beta oscillations.
+- Detect beta bursts using an amplitude-based thresholding approach.
 - Quantify burst characteristics, including onset, duration, peak amplitude, and peak power.
-- Examine temporal variations in burst peak amplitude.
-- Perform frequency-domain and time-frequency analysis using FFT, PSD, and Short-Time Fourier Transform (STFT).
+- Examine the spectral properties of beta activity.
+- Investigate temporal variations in beta burst activity.
+- Visualise neural activity using time-frequency representations.
 
 ## Methodology
 
 The analysis pipeline consists of the following stages:
 
-### 1. EEG Data Loading and Inspection
+### 1. EEG Data Loading and Preprocessing
 
-EEG recordings are loaded from MATLAB `.mat` files. The pipeline examines the number of channels, time points, trials, and sampling frequency.
-
-The expected data structure is an EEGLAB-style structure containing:
-
-- `EEG.data`: EEG recordings arranged as channels × time points × trials.
-- `EEG.srate`: Sampling frequency in Hz.
-- `EEG.chanlocs`: Channel information and labels.
+The pipeline loads EEG recordings stored in MATLAB `.mat` format. The EEG data are expected to contain signal information, sampling frequency, and channel information.
 
 ### 2. Beta-Band Filtering
 
-A sixth-order Butterworth IIR bandpass filter is designed to extract beta-band activity between 13 and 30 Hz.
-
-Zero-phase filtering is performed using MATLAB's `filtfilt` function to avoid phase distortion.
+A sixth-order Butterworth IIR bandpass filter is applied to extract beta-band activity between **13 and 30 Hz**. Zero-phase filtering is performed using MATLAB's `filtfilt` function.
 
 ### 3. Amplitude Envelope Extraction
 
-The Hilbert transform is applied to the filtered EEG signal to obtain its analytic representation.
-
-The instantaneous amplitude envelope is calculated as:
+The Hilbert transform is used to estimate the instantaneous amplitude envelope of the filtered beta signal:
 
 \[
-A(t)=|\mathcal{H}(x_\beta(t))|
+A(t)=|\mathcal{H}(x(t))|
 \]
 
-where \(x_\beta(t)\) is the beta-filtered EEG signal and \(\mathcal{H}\) denotes the analytic signal obtained using the Hilbert transform.
+where \(x(t)\) represents the filtered EEG signal and \(\mathcal{H}\) denotes the analytic signal obtained through the Hilbert transform.
 
-### 4. Global Threshold Estimation
+### 4. Beta Burst Detection
 
-A global amplitude threshold is calculated using the median and standard deviation of the amplitude envelopes across channels and trials:
+Beta bursts are identified using a global amplitude threshold calculated as:
 
 \[
-T = \operatorname{median}(A) + k \cdot \operatorname{std}(A)
+T = \operatorname{median}(A)+1.5\times\operatorname{std}(A)
 \]
 
-The implementation uses:
+Periods during which the amplitude envelope exceeds the threshold are identified as candidate bursts. A minimum burst duration of 10 ms is used.
 
-- Threshold multiplier: \(k=1.5\)
-- Minimum burst duration: 10 ms
+### 5. Burst Feature Extraction
 
-### 5. Beta Burst Detection and Feature Extraction
+The detected bursts are characterised using the following features:
 
-A beta burst is identified when the amplitude envelope exceeds the global threshold for at least the specified minimum duration.
-
-The following features are extracted:
-
-- Burst onset time
+- Burst onset
 - Burst duration
 - Peak amplitude
 - Peak power
 
-### 6. Temporal Trend Analysis
+### 6. Spectral Analysis
 
-Burst peak amplitudes are examined as a function of time.
+Frequency-domain characteristics are investigated using:
 
-The implementation includes trial-wise and combined-trial visualisations, with linear trend fitting to examine temporal patterns.
+- Fast Fourier Transform (FFT)
+- Welch's Power Spectral Density (PSD) estimation
 
-### 7. Spectral Analysis
+### 7. Time-Frequency Analysis
 
-The pipeline includes:
+Short-Time Fourier Transform (STFT)-based visualisations are used to examine the temporal evolution of EEG frequency components, including beta-band activity.
 
-- Fast Fourier Transform (FFT) for frequency-domain analysis.
-- Welch's Power Spectral Density (PSD) estimation.
-- Short-Time Fourier Transform (STFT) for time-frequency analysis.
-- Beta-band and broader frequency-range spectrogram visualisations.
-
-## Analysis Parameters
+## Key Analysis Parameters
 
 | Parameter | Value |
-|---|---|
-| Beta frequency range | 13–30 Hz |
+|---|---:|
+| Beta-band frequency | 13–30 Hz |
 | Filter type | Butterworth IIR |
 | Filter order | 6 |
-| Filtering method | Zero-phase (`filtfilt`) |
-| Envelope extraction | Hilbert transform |
-| Threshold method | Median + k × SD |
-| Threshold multiplier | 1.5 |
+| Threshold | Median + 1.5 × Standard Deviation |
 | Minimum burst duration | 10 ms |
+| PSD window length | 1000 samples |
+| PSD overlap | 500 samples |
+| FFT length (PSD) | 4096 |
 | STFT window length | 510 samples |
-| STFT overlap | 50% |
+| STFT overlap | 255 samples |
 | STFT FFT length | 1024 |
-
-Note: The beta-band STFT visualisation in the current implementation uses an 8–30 Hz display range. This is distinct from the 13–30 Hz filtering range.
 
 ## Requirements
 
 - MATLAB
 - Signal Processing Toolbox
 
-The implementation uses MATLAB functions including `designfilt`, `filtfilt`, `hilbert`, `pwelch`, and `stft`.
+The implementation uses MATLAB signal processing functions for filtering, Hilbert transform-based envelope estimation, spectral analysis, and time-frequency visualisation.
 
-The MATLAB release used for development and testing will be specified after verification.
+## Dataset Description
 
-## Dataset
+The script is designed to work with EEG data stored in MATLAB `.mat` format.
 
-The original EEG recordings are not distributed with this repository.
+The expected EEG structure contains:
 
-To run the analysis, provide an appropriately structured EEG `.mat` file containing the required EEG variables.
+- `EEG.data` – EEG recordings arranged as channels × time points × trials.
+- `EEG.srate` – Sampling frequency of the recordings.
+- `EEG.chanlocs` – Channel location information.
 
-Please ensure that you have the necessary permissions to use and analyse your EEG data.
+**Note:** The original EEG dataset is not included in this repository. Users must provide their own compatible dataset and ensure that they have permission to use it.
 
 ## How to Run
 
 1. Clone or download this repository.
 2. Open MATLAB.
-3. Navigate to the project directory.
-4. Add the `src` directory and its subdirectories to the MATLAB path.
-5. Provide the path to your EEG dataset.
-6. Run the main analysis script.
-7. Select the channels and trials for analysis when prompted.
+3. Ensure that the required Signal Processing Toolbox is available.
+4. Place your EEG dataset in an accessible local directory.
+5. Update the local dataset path in the MATLAB script to point to your own `.mat` file.
+6. Run `finalcode_betaburst.m`.
 
-```matlab
-addpath(genpath('src'));
-run('src/main.m');
-```
+The script uses a local Windows file path in its current version, so this path must be adjusted when running the code on another system.
 
-The dataset path and configuration should be updated according to your local environment.
+## Results and Visualisations
 
-## Outputs
+The analysis pipeline generates visualisations to examine different aspects of beta activity, including:
 
-The pipeline generates visualisations and analysis outputs including:
+- Raw EEG signals
+- Filtered beta-band signals
+- Hilbert amplitude envelopes
+- Detected beta burst periods
+- FFT and power spectral density plots
+- Temporal variations in burst amplitude
+- STFT-based time-frequency representations
 
-- Raw EEG signal plots.
-- Beta-filtered EEG signals.
-- Raw versus filtered signal comparisons.
-- Power Spectral Density plots.
-- FFT amplitude spectra.
-- Beta amplitude envelope visualisations.
-- Threshold-based beta burst detection plots.
-- Burst feature summaries.
-- Temporal burst amplitude trends.
-- Beta-band STFT spectrograms.
-- Broader frequency-range spectrograms.
+Representative output figures can be added to the `results/figures/` directory.
 
-STFT-derived intermediate data are saved as MATLAB `.mat` files in the corresponding output directories.
-
-## Project Structure
+## Repository Structure
 
 ```text
-.
+Extraction-and-Analysis-of-Beta-Bursts-from-EEG-signals/
+│
 ├── README.md
-├── LICENSE
+├── finalcode_betaburst.m
 ├── CITATION.cff
-├── src/
+│
 ├── docs/
+│   ├── methodology.md
+│   ├── parameters.md
+│   └── data_description.md
+│
 ├── results/
+│   └── figures/
+│
 └── references/
+    └── references.md
 ```
 
 ## Scientific Context
 
-This project is motivated by the role of transient beta-band activity in sensorimotor processing and movement control.
+Beta oscillations in the sensorimotor system are closely associated with movement preparation and execution. Analysing beta bursts, rather than relying exclusively on average beta power, allows transient neural events to be investigated in terms of their timing, duration, and amplitude.
 
-The analysis provides a computational framework for studying the temporal organisation and characteristics of beta bursts in EEG recordings.
+This project focuses on computational approaches for extracting and characterising these transient events from EEG recordings, with an emphasis on understanding beta activity in the context of human movement.
+
+## Acknowledgements
+
+This work was carried out as part of the **Summer Research Fellowship Programme (SRFP) 2025** at the **Centre for Neuroscience, Indian Institute of Science (IISc), Bengaluru**, under the supervision of **Prof. Aditya Murthy**.
 
 ## Author
 
 **Anandi Banerjee**
 
 Student Researcher  
-Research interests: Computational Neuroscience, EEG Signal Processing, Machine Learning, and Movement Control.
+Research interests: Computational Neuroscience, EEG Signal Processing, Neural Oscillations, and Machine Learning.
 
-## Acknowledgements
+---
 
-This work was undertaken as part of the Summer Research Fellowship Programme (SRFP) 2025 at the Centre for Neuroscience, Indian Institute of Science (IISc), Bengaluru.
-
-## License
-
-The licensing terms for this repository will be specified in the accompanying LICENSE file.
-
-## Citation
-
-If you use this code in your research, please cite this repository using the information provided in `CITATION.cff`.
-
+If you use this repository in your research, please cite it using the citation information provided in [`CITATION.cff`](CITATION.cff).
