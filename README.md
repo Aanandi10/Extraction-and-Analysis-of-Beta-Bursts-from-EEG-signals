@@ -145,12 +145,6 @@ Extraction-and-Analysis-of-Beta-Bursts-from-EEG-signals/
 │   ├── methodology.md
 │   ├── parameters.md
 │   └── data_description.md
-│
-├── results/
-│   └── figures/
-│
-└── references/
-    └── references.md
 ```
 
 ## Scientific Context
